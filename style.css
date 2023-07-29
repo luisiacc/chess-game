@@ -33,25 +33,23 @@ body {
 }
 
 .cell {
-  outline: none;
-  width: calc(100%); /* subtract margins */
-  height: calc(100%); /* subtract margins */
-  margin: 1px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
   font-weight: 600;
   box-sizing: border-box;
 }
 
-.possible-move::after {
-  content: "X";
-  font-size: "2rem";
-  font-weight: 600;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.5);
+.possible-move::before {
+  content: "";
+  display: block;
+  width: 30%;
+  height: 30%;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  position: absolute;
+  top: 35%; /* (100 - 50) / 2 */
+  left: 35%; /* (100 - 50) / 2 */
 }
 
 main {

@@ -12,6 +12,22 @@ const PieceType = {
   King: "king",
 };
 
+function cellIsEmpty(cell) {
+  return cell === null || cell === undefined;
+}
+
+function positionIsInPossibleMoves(position, possibleMoves) {
+  for (let i = 0; i < possibleMoves.length; i++) {
+    if (
+      position[0] === possibleMoves[i][0] &&
+      position[1] === possibleMoves[i][1]
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 class Piece {
   constructor(color, type, board) {
     this.color = color;
@@ -41,15 +57,15 @@ class Pawn extends Piece {
     const nextNextRow = this.positionY + 2 * direction;
 
     // check if the next row is empty
-    console.log({ board, nextRow, positionX: this.positionX });
-    if (board[nextRow][this.positionX] == null) {
+    if (cellIsEmpty(board[nextRow][this.positionX])) {
       moves.push([nextRow, this.positionX]);
     }
 
     // check if the next next row is empty and the pawn is in the starting row
     if (
       this.positionY === startingRow &&
-      board[nextNextRow][this.positionX] === null
+      cellIsEmpty(board[nextRow][this.positionX]) && // check if the next row is empty
+      cellIsEmpty(board[nextNextRow][this.positionX])
     ) {
       moves.push([nextNextRow, this.positionX]);
     }
@@ -59,7 +75,7 @@ class Pawn extends Piece {
     const rightDiagonal = this.positionX + 1;
     if (
       leftDiagonal >= 0 &&
-      board[nextRow][leftDiagonal] != null &&
+      !cellIsEmpty(board[nextRow][leftDiagonal]) &&
       board[nextRow][leftDiagonal].color !== this.color &&
       board[nextRow][leftDiagonal]?.type !== PieceType.King
     ) {
@@ -68,7 +84,7 @@ class Pawn extends Piece {
 
     if (
       rightDiagonal >= 0 &&
-      board[nextRow][rightDiagonal] != null &&
+      !cellIsEmpty(board[nextRow][rightDiagonal]) &&
       board[nextRow][rightDiagonal]?.color !== this.color &&
       board[nextRow][rightDiagonal]?.type !== PieceType.King
     ) {
@@ -181,6 +197,14 @@ function getBoardInstance() {
     return this.board[row][col];
   };
 
+  this.getPieceFromElement = function (element) {
+    // position is a string 4,5 for ex
+    const [row, col] = element.dataset.position
+      .split(",")
+      .map((x) => parseInt(x));
+    return this.board[row][col];
+  };
+
   this.redrawAfterMove = function (fromRow, fromCol, toRow, toCol) {
     const getCurrentCell = (row, col) => {
       return document.querySelector(`#${getCellCode(row, col)}`);
@@ -271,6 +295,8 @@ function removePossibleCells(positions) {
   });
 }
 
+let draggedElementData = null;
+
 function getCell(row, col, piece) {
   const cell = document.createElement("div");
   cell.classList.add("cell");
@@ -295,6 +321,7 @@ function getCell(row, col, piece) {
   // add listener to accept drop
   cell.addEventListener("dragstart", function (event) {
     event.dataTransfer.setData("text/plain", event.target.dataset.position);
+    draggedElementData = event.target.dataset.position;
     event.target.style.backgroundColor = "transparent";
     event.target.style.border = "none";
     event.target.style.outline = "none";
@@ -306,14 +333,27 @@ function getCell(row, col, piece) {
       .split(",")
       .map((x) => parseInt(x));
     let realPiece = Board.getPiece(row, col);
-    console.log({ realPiece });
-    console.log({ moves: realPiece.possibleMoves(Board.board) });
     possibleCells = realPiece.possibleMoves(Board.board);
     drawPossibleCells(possibleCells);
   });
 
+  cell.addEventListener("dragenter", function (event) {
+    // check if the cell is in the possible moves
+    const fromPosition = draggedElementData;
+    const [fromRow, fromCol] = fromPosition.split(",").map((x) => parseInt(x));
+    const piece = Board.getPiece(fromRow, fromCol);
+    if (piece) {
+      const movesAsString = piece
+        .possibleMoves(Board.board)
+        .map((x) => x.join(","));
+      const thisPosition = `${row},${col}`;
+      if (movesAsString.includes(thisPosition)) {
+        cell.style.backgroundColor = "yellow";
+      }
+    }
+  });
   cell.addEventListener("dragover", function (event) {
-    cell.style.backgroundColor = "yellow";
+    // this allows dropping
     event.preventDefault();
   });
   cell.addEventListener("dragleave", function (event) {
@@ -326,10 +366,7 @@ function getCell(row, col, piece) {
   });
 
   cell.addEventListener("drop", function (event) {
-    event.preventDefault();
     cell.style.backgroundColor = "";
-    removePossibleCells(possibleCells);
-    possibleCells = [];
     const fromPosition = event.dataTransfer.getData("text/plain");
     const [fromRow, fromCol] = fromPosition.split(",").map((x) => parseInt(x));
     const [toRow, toCol] = cell.dataset.position
@@ -339,8 +376,16 @@ function getCell(row, col, piece) {
     if (fromRow === toRow && fromCol === toCol) {
       return;
     }
-
-    Board.movePiece(fromRow, fromCol, toRow, toCol);
+    let piece = Board.getPiece(fromRow, fromCol);
+    if (
+      positionIsInPossibleMoves(
+        [toRow, toCol],
+        piece.possibleMoves(Board.board),
+      )
+    ) {
+      Board.movePiece(fromRow, fromCol, toRow, toCol);
+    }
+    event.preventDefault();
   });
 
   return cell;
