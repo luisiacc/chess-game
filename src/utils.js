@@ -28,3 +28,9 @@ export function positionIsInPossibleMoves(position, possibleMoves) {
   }
   return false;
 }
+
+export async function emitPieceSound() {
+  let audio = new Audio("assets/sound.wav");
+  audio.volume = 0.1;
+  audio.play();
+}

@@ -14,6 +14,7 @@ import {
   positionIsInPossibleMoves,
   makeCellUndraggable,
   getCellCode,
+  emitPieceSound,
 } from "./utils.js";
 
 function getBoardInstance() {
@@ -103,6 +104,7 @@ function getBoardInstance() {
       this.board[toRow][toCol].positionY = toRow;
     }
     this.redrawAfterMove(fromRow, fromCol, toRow, toCol);
+    emitPieceSound();
 
     // check for castle
     if (this.board[toRow][toCol] instanceof King) {
