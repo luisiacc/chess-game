@@ -1,144 +1,20 @@
-const Color = {
-  White: "white",
-  Black: "black",
-};
+import {
+  Color,
+  PieceType,
+  Pawn,
+  Rook,
+  Knight,
+  Bishop,
+  Queen,
+  King,
+} from "./pieces.js";
 
-const PieceType = {
-  Pawn: "pawn",
-  Knight: "knight",
-  Bishop: "bishop",
-  Rook: "rook",
-  Queen: "queen",
-  King: "king",
-};
-
-function cellIsEmpty(cell) {
-  return cell === null || cell === undefined;
-}
-
-function positionIsInPossibleMoves(position, possibleMoves) {
-  for (let i = 0; i < possibleMoves.length; i++) {
-    if (
-      position[0] === possibleMoves[i][0] &&
-      position[1] === possibleMoves[i][1]
-    ) {
-      return true;
-    }
-  }
-  return false;
-}
-
-class Piece {
-  constructor(color, type, board) {
-    this.color = color;
-    this.type = type;
-
-    this.positionX = null;
-    this.positionY = null;
-  }
-
-  possibleMoves(board) {
-    return [];
-  }
-}
-
-class Pawn extends Piece {
-  constructor(color, type) {
-    super(color, type);
-    this.text = "P";
-  }
-
-  possibleMoves(board) {
-    // generate all possible moves a pawn can make, returns a list of moves in the form of [y, x]
-    const moves = [];
-    const direction = this.color === Color.White ? -1 : 1;
-    const startingRow = this.color === Color.White ? 6 : 1;
-    const nextRow = this.positionY + direction;
-    const nextNextRow = this.positionY + 2 * direction;
-
-    // check if the next row is empty
-    if (cellIsEmpty(board[nextRow][this.positionX])) {
-      moves.push([nextRow, this.positionX]);
-    }
-
-    // check if the next next row is empty and the pawn is in the starting row
-    if (
-      this.positionY === startingRow &&
-      cellIsEmpty(board[nextRow][this.positionX]) && // check if the next row is empty
-      cellIsEmpty(board[nextNextRow][this.positionX])
-    ) {
-      moves.push([nextNextRow, this.positionX]);
-    }
-
-    // check if the pawn can take a piece
-    const leftDiagonal = this.positionX - 1;
-    const rightDiagonal = this.positionX + 1;
-    if (
-      leftDiagonal >= 0 &&
-      !cellIsEmpty(board[nextRow][leftDiagonal]) &&
-      board[nextRow][leftDiagonal].color !== this.color &&
-      board[nextRow][leftDiagonal]?.type !== PieceType.King
-    ) {
-      moves.push([nextRow, leftDiagonal]);
-    }
-
-    if (
-      rightDiagonal >= 0 &&
-      !cellIsEmpty(board[nextRow][rightDiagonal]) &&
-      board[nextRow][rightDiagonal]?.color !== this.color &&
-      board[nextRow][rightDiagonal]?.type !== PieceType.King
-    ) {
-      moves.push([nextRow, rightDiagonal]);
-    }
-
-    return moves;
-  }
-}
-
-class Knight extends Piece {
-  constructor(color, type) {
-    super(color, type);
-    this.text = "K";
-  }
-}
-
-class Bishop extends Piece {
-  constructor(color, type) {
-    super(color, type);
-    this.text = "B";
-  }
-}
-
-class Rook extends Piece {
-  constructor(color, type) {
-    super(color, type);
-    this.text = "R";
-  }
-}
-
-class Queen extends Piece {
-  constructor(color, type) {
-    super(color, type);
-    this.text = "Q";
-  }
-}
-
-class King extends Piece {
-  constructor(color, type) {
-    super(color, type);
-    this.text = "Ki";
-  }
-}
-
-function makeCellDraggable(cell) {
-  cell.style.cursor = "pointer";
-  cell.setAttribute("draggable", true);
-}
-
-function makeCellUndraggable(cell) {
-  cell.style.cursor = "default";
-  cell.setAttribute("draggable", false);
-}
+import {
+  makeCellDraggable,
+  positionIsInPossibleMoves,
+  makeCellUndraggable,
+  getCellCode,
+} from "./utils.js";
 
 function getBoardInstance() {
   this.rows = 8;
@@ -215,7 +91,7 @@ function getBoardInstance() {
     toCell.setAttribute("style", fromCell.getAttribute("style"));
     fromCell.setAttribute("style", "");
     makeCellDraggable(toCell);
-    makeCellDraggable(fromCell);
+    makeCellUndraggable(fromCell);
   };
 
   this.movePiece = function (fromRow, fromCol, toRow, toCol) {
@@ -244,11 +120,6 @@ function getBoardInstance() {
 
 const Board = new getBoardInstance();
 Board.cachePiecesPositions();
-
-function getCellCode(row, col) {
-  const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-  return letters[col] + (Board.rows - row);
-}
 
 const pieceImage = {
   [Color.White]: {

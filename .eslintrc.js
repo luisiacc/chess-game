@@ -11,7 +11,7 @@ module.exports = {
       },
       files: [".eslintrc.{js,cjs}"],
       parserOptions: {
-        sourceType: "script",
+        sourceType: "module",
       },
     },
   ],
