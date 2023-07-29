@@ -327,6 +327,61 @@ class King extends Piece {
       }
     });
 
+    // check for castling
+    if (
+      this.color === Color.White &&
+      this.positionY === 7 &&
+      this.positionX === 4
+    ) {
+      if (
+        board[7][0]?.type === PieceType.Rook &&
+        board[7][0].color === Color.White
+      ) {
+        if (
+          board[7][1] === null &&
+          board[7][2] === null &&
+          board[7][3] === null
+        ) {
+          moves.push([7, 2]);
+        }
+      }
+      if (
+        board[7][7]?.type === PieceType.Rook &&
+        board[7][7].color === Color.White
+      ) {
+        if (board[7][5] === null && board[7][6] === null) {
+          moves.push([7, 6]);
+        }
+      }
+    }
+
+    if (
+      this.color === Color.Black &&
+      this.positionY === 0 &&
+      this.positionX === 4
+    ) {
+      if (
+        board[0][0]?.type === PieceType.Rook &&
+        board[0][0].color === Color.Black
+      ) {
+        if (
+          board[0][1] === null &&
+          board[0][2] === null &&
+          board[0][3] === null
+        ) {
+          moves.push([0, 2]);
+        }
+      }
+      if (
+        board[0][7]?.type === PieceType.Rook &&
+        board[0][7].color === Color.Black
+      ) {
+        if (board[0][5] === null && board[0][6] === null) {
+          moves.push([0, 6]);
+        }
+      }
+    }
+
     return moves;
   }
 }

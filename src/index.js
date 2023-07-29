@@ -103,6 +103,15 @@ function getBoardInstance() {
       this.board[toRow][toCol].positionY = toRow;
     }
     this.redrawAfterMove(fromRow, fromCol, toRow, toCol);
+
+    // check for castle
+    if (this.board[toRow][toCol] instanceof King) {
+      if (toCol - fromCol === 2) {
+        this.movePiece(toRow, 7, toRow, 5);
+      } else if (toCol - fromCol === -2) {
+        this.movePiece(toRow, 0, toRow, 3);
+      }
+    }
   };
 
   this.cachePiecesPositions = function () {
