@@ -26,7 +26,7 @@ body {
   grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(8, 1fr);
   grid-gap: 0px;
-  width: 90vw;
+  width: 70vw;
   aspect-ratio: 1;
   border-radius: 4px;
   box-sizing: border-box;
@@ -59,13 +59,41 @@ main {
   width: 100%;
 }
 
-#turn {
+#infobar {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 100%;
   font-size: 2rem;
   font-weight: 600;
-  margin-top: 20px;
+  padding-left: 20px;
+  border: 1px solid;
+  border-color: var(--bg-black);
+  border-radius: 4px;
+  margin-left: 10px;
+  background-color: var(--bg-white);
+}
+
+.navigation {
+  display: flex;
+  direction: row;
+}
+
+.player {
+  font-family: "Roboto", sans-serif;
+  color: var(--bg-black);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  gap: 5px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.time {
+  font-size: 4rem;
+  font-weight: 600;
+  color: #3c0c0c;
 }

@@ -19,16 +19,27 @@ function updateDraggableStateOnBoard(board, draggableColor) {
 }
 
 function updateTurnText(newTurn) {
-  let text = "It's White's turn";
+  let whiteEl = document.querySelector("#player-white-turn");
+  let blackEl = document.querySelector("#player-black-turn");
   if (newTurn == Color.Black) {
-    text = "It's Black's turn";
+    blackEl.innerHTML = "🟢";
+    whiteEl.innerHTML = "";
+  } else {
+    blackEl.innerHTML = "";
+    whiteEl.innerHTML = "🟢";
   }
-  let el = document.querySelector("#turn");
-  el.innerHTML = text;
+}
+
+function updateElementTime(color, time) {
+  time = Math.max(time, 0);
+  const el = document.querySelector(`#player-${color}-time`);
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
+  el.innerHTML = `${minutes}:${seconds}`;
 }
 
 export class Game {
-  constructor(board) {
+  constructor(board, time) {
     this.board = board;
     this.turn = Color.White;
     this.check = false;
@@ -38,6 +49,12 @@ export class Game {
 
     this.whiteKingMoved = false;
     this.blackKingMoved = false;
+    this.time = time || 5 * 60;
+
+    this.whiteTimeLeft = this.time;
+    this.blackTimeLeft = this.time;
+
+    this.currentInterval = null;
   }
 
   changeTurn() {
@@ -48,5 +65,19 @@ export class Game {
     }
     updateDraggableStateOnBoard(this.board, this.turn);
     updateTurnText(this.turn);
+
+    // trigger intervals
+    if (this.currentInterval) {
+      clearInterval(this.currentInterval);
+    }
+    this.currentInterval = setInterval(() => {
+      if (this.turn === Color.White) {
+        this.whiteTimeLeft--;
+        updateElementTime(this.turn, this.whiteTimeLeft);
+      } else {
+        this.blackTimeLeft--;
+        updateElementTime(this.turn, this.blackTimeLeft);
+      }
+    }, 1000);
   }
 }

@@ -6,8 +6,25 @@
     <link type="text/css" rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main id="main"></main>
-    <div id="turn">Its White's Turn</div>
+    <div class="navigation">
+      <div id="main"></div>
+      <div id="infobar">
+        <div id="player-black" class="player">
+          <div class="player__name">
+            Player 2 <span id="player-black-turn"></span>
+          </div>
+          <div id="player-black-time" class="time">5:00</div>
+          <!-- <div data-id="player-black-score" class="player__score">0</div> -->
+        </div>
+        <div id="player1" class="player">
+          <div id="player-white-time" class="time">5:00</div>
+          <!-- <div data-id="player--white-score" class="player__score">0</div> -->
+          <div class="player__name">
+            Player 1 <span id="player-white-turn">🟢</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
   <script type="module" src="./src/index.js"></script>
 </html>
