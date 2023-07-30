@@ -18,6 +18,8 @@ import {
   emitPieceSound,
 } from "./utils.js";
 
+const FREE_MOVE = true;
+
 function getBoardInstance() {
   this.rows = 8;
   this.columns = 8;
@@ -91,6 +93,7 @@ function getBoardInstance() {
     const toCell = getCurrentCell(toRow, toCol);
 
     toCell.setAttribute("style", fromCell.getAttribute("style"));
+    toCell.style.backgroundImage = getBgImageUrl(this.getPiece(toRow, toCol));
     fromCell.setAttribute("style", "");
     makeCellDraggable(toCell);
     makeCellUndraggable(fromCell);
@@ -105,11 +108,21 @@ function getBoardInstance() {
   ) {
     this.board[toRow][toCol] = this.board[fromRow][fromCol];
     this.board[fromRow][fromCol] = null;
-    // TODO: do something when it's taking
+
+    // check for coronation
+    if (this.board[toRow][toCol] instanceof Pawn) {
+      if (toRow === 0 || toRow === 7) {
+        const color = this.board[toRow][toCol].color;
+        this.board[toRow][toCol] = new Queen(color, PieceType.Queen);
+        console.log({ color, newCell: this.board[toRow][toCol] });
+      }
+    }
+
     if (this.board[toRow][toCol]) {
       this.board[toRow][toCol].positionX = toCol;
       this.board[toRow][toCol].positionY = toRow;
     }
+
     this.redrawAfterMove(fromRow, fromCol, toRow, toCol);
     emitPieceSound();
 
@@ -128,6 +141,9 @@ function getBoardInstance() {
       }
     }
 
+    if (FREE_MOVE) {
+      return;
+    }
     if (changeTurn) {
       game.changeTurn();
     }
@@ -197,6 +213,10 @@ function removePossibleCells(positions) {
 
 let draggedElementData = null;
 
+function getBgImageUrl(piece) {
+  return `url('pieces-assets/${pieceImage[piece.color][piece.type]}')`;
+}
+
 function getCell(row, col, piece) {
   const cell = document.createElement("div");
   cell.classList.add("cell");
@@ -211,9 +231,7 @@ function getCell(row, col, piece) {
   };
   cell.classList.add(bgColor[color]);
   if (piece) {
-    cell.style.backgroundImage = `url('pieces-assets/${
-      pieceImage[piece.color][piece.type]
-    }')`;
+    cell.style.backgroundImage = getBgImageUrl(piece);
     cell.style.backgroundSize = "cover";
     if (piece.color == Color.White) {
       makeCellDraggable(cell);
@@ -277,7 +295,10 @@ function getCell(row, col, piece) {
       return;
     }
     let piece = Board.getPiece(fromRow, fromCol);
-    if (positionIsInPossibleMoves([toRow, toCol], piece.possibleMoves(game))) {
+    if (
+      FREE_MOVE ||
+      positionIsInPossibleMoves([toRow, toCol], piece.possibleMoves(game))
+    ) {
       Board.movePiece(fromRow, fromCol, toRow, toCol);
     }
     event.preventDefault();

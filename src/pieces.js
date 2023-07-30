@@ -42,6 +42,10 @@ function getPositionsCoveredByEnemyPieces(game, color, kingPosition) {
   return moves;
 }
 
+function getCoronationOptions(color) {
+  return [PieceType.Knight, PieceType.Bishop, PieceType.Rook, PieceType.Queen];
+}
+
 class Piece {
   constructor(color, type, board) {
     this.color = color;
@@ -428,7 +432,7 @@ class King extends Piece {
     const coveredByEnemies = getPositionsCoveredByEnemyPieces(
       game,
       this.color,
-      [this.positionY, this.positionX]
+      [this.positionY, this.positionX],
     );
     possibleMoves.forEach((move) => {
       const [y, x] = move;
