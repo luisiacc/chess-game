@@ -17,18 +17,27 @@ const PieceType = {
   King: "king",
 };
 
-function getPositionsCoveredByEnemyPieces(game, color) {
+function getPositionsCoveredByEnemyPieces(game, color, kingPosition) {
   const board = game.board.board;
+  const king = board[kingPosition[0]][kingPosition[1]];
+  // temporarily set the king position to null so that we can generate the moves of the enemy pieces
+  board[kingPosition[0]][kingPosition[1]] = null;
   const moves = new Set();
   for (let i = 0; i < board.length; i++) {
     const row = board[i];
     for (let j = 0; j < row.length; j++) {
       const piece = row[j];
-      if (piece && piece.color !== color && piece.type !== PieceType.King) {
-        moves.add(...piece.takingMoves(game).map((x) => x.join(",")));
+      if (piece && piece.color !== color) {
+        for (let move of piece.takingMoves(game)) {
+          if (!!move) {
+            moves.add(move.join(","));
+          }
+        }
       }
     }
   }
+  // restore the king position
+  board[kingPosition[0]][kingPosition[1]] = king;
   // this is a set of strings, is faster to check for string in sets
   return moves;
 }
@@ -201,6 +210,39 @@ class Bishop extends Piece {
 
     return moves;
   }
+
+  possibleMoves(game) {
+    const board = game.board.board;
+    const moves = [];
+    const directions = [
+      [1, 1],
+      [1, -1],
+      [-1, 1],
+      [-1, -1],
+    ];
+
+    directions.forEach((direction) => {
+      const [y, x] = direction;
+      let nextY = this.positionY + y;
+      let nextX = this.positionX + x;
+
+      while (nextY >= 0 && nextY <= 7 && nextX >= 0 && nextX <= 7) {
+        if (cellIsEmpty(board[nextY][nextX])) {
+          moves.push([nextY, nextX]);
+        } else if (board[nextY][nextX]?.type !== PieceType.King) {
+          moves.push([nextY, nextX]);
+          break;
+        } else {
+          break;
+        }
+
+        nextY += y;
+        nextX += x;
+      }
+    });
+
+    return moves;
+  }
 }
 
 class Rook extends Piece {
@@ -231,6 +273,39 @@ class Rook extends Piece {
           board[nextY][nextX].color !== this.color &&
           board[nextY][nextX]?.type !== PieceType.King
         ) {
+          moves.push([nextY, nextX]);
+          break;
+        } else {
+          break;
+        }
+
+        nextY += y;
+        nextX += x;
+      }
+    });
+
+    return moves;
+  }
+
+  takingMoves(game) {
+    const board = game.board.board;
+    const moves = [];
+    const directions = [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ];
+
+    directions.forEach((direction) => {
+      const [y, x] = direction;
+      let nextY = this.positionY + y;
+      let nextX = this.positionX + x;
+
+      while (nextY >= 0 && nextY <= 7 && nextX >= 0 && nextX <= 7) {
+        if (cellIsEmpty(board[nextY][nextX])) {
+          moves.push([nextY, nextX]);
+        } else if (board[nextY][nextX]?.type !== PieceType.King) {
           moves.push([nextY, nextX]);
           break;
         } else {
@@ -291,6 +366,43 @@ class Queen extends Piece {
 
     return moves;
   }
+
+  takingMoves(game) {
+    const board = game.board.board;
+    const moves = [];
+    const directions = [
+      [1, 1],
+      [1, -1],
+      [-1, 1],
+      [-1, -1],
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ];
+
+    directions.forEach((direction) => {
+      const [y, x] = direction;
+      let nextY = this.positionY + y;
+      let nextX = this.positionX + x;
+
+      while (nextY >= 0 && nextY <= 7 && nextX >= 0 && nextX <= 7) {
+        if (cellIsEmpty(board[nextY][nextX])) {
+          moves.push([nextY, nextX]);
+        } else if (board[nextY][nextX]?.type !== PieceType.King) {
+          moves.push([nextY, nextX]);
+          break;
+        } else {
+          break;
+        }
+
+        nextY += y;
+        nextX += x;
+      }
+    });
+
+    return moves;
+  }
 }
 
 class King extends Piece {
@@ -316,6 +428,7 @@ class King extends Piece {
     const coveredByEnemies = getPositionsCoveredByEnemyPieces(
       game,
       this.color,
+      [this.positionY, this.positionX]
     );
     possibleMoves.forEach((move) => {
       const [y, x] = move;
@@ -390,6 +503,20 @@ class King extends Piece {
     }
 
     return moves;
+  }
+
+  takingMoves(game) {
+    const possibleMoves = [
+      [this.positionY - 1, this.positionX - 1],
+      [this.positionY - 1, this.positionX],
+      [this.positionY - 1, this.positionX + 1],
+      [this.positionY, this.positionX - 1],
+      [this.positionY, this.positionX + 1],
+      [this.positionY + 1, this.positionX - 1],
+      [this.positionY + 1, this.positionX],
+      [this.positionY + 1, this.positionX + 1],
+    ];
+    return possibleMoves;
   }
 }
 

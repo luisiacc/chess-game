@@ -211,7 +211,7 @@ function getCell(row, col, piece) {
   };
   cell.classList.add(bgColor[color]);
   if (piece) {
-    cell.style.backgroundImage = `url('./pieces-assets/${
+    cell.style.backgroundImage = `url('pieces-assets/${
       pieceImage[piece.color][piece.type]
     }')`;
     cell.style.backgroundSize = "cover";
