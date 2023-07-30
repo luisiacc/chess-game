@@ -58,3 +58,14 @@ main {
   padding-top: 16px;
   width: 100%;
 }
+
+#turn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-top: 20px;
+}

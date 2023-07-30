@@ -17,17 +17,15 @@ const PieceType = {
   King: "king",
 };
 
-function getPositionsCoveredByEnemyPieces(board, color) {
+function getPositionsCoveredByEnemyPieces(game, color) {
+  const board = game.board.board;
   const moves = new Set();
   for (let i = 0; i < board.length; i++) {
     const row = board[i];
     for (let j = 0; j < row.length; j++) {
       const piece = row[j];
       if (piece && piece.color !== color && piece.type !== PieceType.King) {
-        if (piece.type === PieceType.Pawn) {
-          console.log({ piece, moves: piece.takingMoves(board) });
-        }
-        moves.add(...piece.takingMoves(board).map((x) => x.join(",")));
+        moves.add(...piece.takingMoves(game).map((x) => x.join(",")));
       }
     }
   }
@@ -44,12 +42,12 @@ class Piece {
     this.positionY = null;
   }
 
-  possibleMoves(board) {
+  possibleMoves(game) {
     return [];
   }
 
-  takingMoves(board) {
-    return this.possibleMoves(board);
+  takingMoves(game) {
+    return this.possibleMoves(game);
   }
 }
 
@@ -59,7 +57,8 @@ class Pawn extends Piece {
     this.text = "P";
   }
 
-  possibleMoves(board) {
+  possibleMoves(game) {
+    const board = game.board.board;
     // generate all possible moves a pawn can make, returns a list of moves in the form of [y, x]
     const moves = [];
     const direction = this.color === Color.White ? -1 : 1;
@@ -105,7 +104,8 @@ class Pawn extends Piece {
     return moves;
   }
 
-  takingMoves(board) {
+  takingMoves(game) {
+    const board = game.board.board;
     const moves = [];
     const direction = this.color === Color.White ? -1 : 1;
     const nextRow = this.positionY + direction;
@@ -129,7 +129,8 @@ class Knight extends Piece {
     this.text = "K";
   }
 
-  possibleMoves(board) {
+  possibleMoves(game) {
+    const board = game.board.board;
     const moves = [];
     const possibleMoves = [
       [this.positionY - 2, this.positionX - 1],
@@ -165,7 +166,8 @@ class Bishop extends Piece {
     this.text = "B";
   }
 
-  possibleMoves(board) {
+  possibleMoves(game) {
+    const board = game.board.board;
     const moves = [];
     const directions = [
       [1, 1],
@@ -207,7 +209,8 @@ class Rook extends Piece {
     this.text = "R";
   }
 
-  possibleMoves(board) {
+  possibleMoves(game) {
+    const board = game.board.board;
     const moves = [];
     const directions = [
       [1, 0],
@@ -249,7 +252,8 @@ class Queen extends Piece {
     this.text = "Q";
   }
 
-  possibleMoves(board) {
+  possibleMoves(game) {
+    const board = game.board.board;
     const moves = [];
     const directions = [
       [1, 1],
@@ -295,7 +299,8 @@ class King extends Piece {
     this.text = "Ki";
   }
 
-  possibleMoves(board) {
+  possibleMoves(game) {
+    const board = game.board.board;
     const moves = [];
     const possibleMoves = [
       [this.positionY - 1, this.positionX - 1],
@@ -309,7 +314,7 @@ class King extends Piece {
     ];
 
     const coveredByEnemies = getPositionsCoveredByEnemyPieces(
-      board,
+      game,
       this.color,
     );
     possibleMoves.forEach((move) => {
@@ -331,7 +336,8 @@ class King extends Piece {
     if (
       this.color === Color.White &&
       this.positionY === 7 &&
-      this.positionX === 4
+      this.positionX === 4 &&
+      !game.whiteKingMoved
     ) {
       if (
         board[7][0]?.type === PieceType.Rook &&
@@ -358,7 +364,8 @@ class King extends Piece {
     if (
       this.color === Color.Black &&
       this.positionY === 0 &&
-      this.positionX === 4
+      this.positionX === 4 &&
+      !game.blackKingMoved
     ) {
       if (
         board[0][0]?.type === PieceType.Rook &&

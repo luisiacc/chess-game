@@ -1,3 +1,4 @@
+import { Game } from "./game.js";
 import {
   Color,
   PieceType,
@@ -95,7 +96,13 @@ function getBoardInstance() {
     makeCellUndraggable(fromCell);
   };
 
-  this.movePiece = function (fromRow, fromCol, toRow, toCol) {
+  this.movePiece = function (
+    fromRow,
+    fromCol,
+    toRow,
+    toCol,
+    changeTurn = true,
+  ) {
     this.board[toRow][toCol] = this.board[fromRow][fromCol];
     this.board[fromRow][fromCol] = null;
     // TODO: do something when it's taking
@@ -108,11 +115,21 @@ function getBoardInstance() {
 
     // check for castle
     if (this.board[toRow][toCol] instanceof King) {
-      if (toCol - fromCol === 2) {
-        this.movePiece(toRow, 7, toRow, 5);
-      } else if (toCol - fromCol === -2) {
-        this.movePiece(toRow, 0, toRow, 3);
+      let color = this.board[toRow][toCol].color;
+      if (color == Color.White) {
+        game.whiteKingMoved = true;
+      } else {
+        game.blackKingMoved = true;
       }
+      if (toCol - fromCol === 2) {
+        this.movePiece(toRow, 7, toRow, 5, false);
+      } else if (toCol - fromCol === -2) {
+        this.movePiece(toRow, 0, toRow, 3, false);
+      }
+    }
+
+    if (changeTurn) {
+      game.changeTurn();
     }
   };
 
@@ -131,6 +148,7 @@ function getBoardInstance() {
 
 const Board = new getBoardInstance();
 Board.cachePiecesPositions();
+const game = new Game(Board);
 
 const pieceImage = {
   [Color.White]: {
@@ -215,7 +233,7 @@ function getCell(row, col, piece) {
       .split(",")
       .map((x) => parseInt(x));
     let realPiece = Board.getPiece(row, col);
-    possibleCells = realPiece.possibleMoves(Board.board);
+    possibleCells = realPiece.possibleMoves(game);
     drawPossibleCells(possibleCells);
   });
 
@@ -226,7 +244,7 @@ function getCell(row, col, piece) {
     const piece = Board.getPiece(fromRow, fromCol);
     if (piece) {
       const movesAsString = piece
-        .possibleMoves(Board.board)
+        .possibleMoves(game)
         .map((x) => x.join(","));
       const thisPosition = `${row},${col}`;
       if (movesAsString.includes(thisPosition)) {
@@ -262,7 +280,7 @@ function getCell(row, col, piece) {
     if (
       positionIsInPossibleMoves(
         [toRow, toCol],
-        piece.possibleMoves(Board.board),
+        piece.possibleMoves(game),
       )
     ) {
       Board.movePiece(fromRow, fromCol, toRow, toCol);
