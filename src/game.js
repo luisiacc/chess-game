@@ -35,7 +35,8 @@ function updateElementTime(color, time) {
   const el = document.querySelector(`#player-${color}-time`);
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
-  el.innerHTML = `${minutes}:${seconds}`;
+  const paddedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+  el.innerHTML = `${minutes}:${paddedSeconds}`;
 }
 
 export class Game {
