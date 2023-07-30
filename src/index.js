@@ -215,7 +215,9 @@ function getCell(row, col, piece) {
       pieceImage[piece.color][piece.type]
     }')`;
     cell.style.backgroundSize = "cover";
-    makeCellDraggable(cell);
+    if (piece.color == Color.White) {
+      makeCellDraggable(cell);
+    }
   }
 
   // add listener to accept drop
@@ -243,9 +245,7 @@ function getCell(row, col, piece) {
     const [fromRow, fromCol] = fromPosition.split(",").map((x) => parseInt(x));
     const piece = Board.getPiece(fromRow, fromCol);
     if (piece) {
-      const movesAsString = piece
-        .possibleMoves(game)
-        .map((x) => x.join(","));
+      const movesAsString = piece.possibleMoves(game).map((x) => x.join(","));
       const thisPosition = `${row},${col}`;
       if (movesAsString.includes(thisPosition)) {
         cell.style.backgroundColor = "yellow";
@@ -277,12 +277,7 @@ function getCell(row, col, piece) {
       return;
     }
     let piece = Board.getPiece(fromRow, fromCol);
-    if (
-      positionIsInPossibleMoves(
-        [toRow, toCol],
-        piece.possibleMoves(game),
-      )
-    ) {
+    if (positionIsInPossibleMoves([toRow, toCol], piece.possibleMoves(game))) {
       Board.movePiece(fromRow, fromCol, toRow, toCol);
     }
     event.preventDefault();
