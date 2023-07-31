@@ -112,6 +112,7 @@ main {
   top: 2px;
   left: 5px;
   font-size: 1.2rem;
+  user-select: none;
 }
 
 .letter-indicator {
@@ -119,6 +120,7 @@ main {
   bottom: 2px;
   right: 5px;
   font-size: 1.2rem;
+  user-select: none;
 }
 
 .dragging .number-indicator {
