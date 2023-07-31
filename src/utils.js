@@ -18,15 +18,9 @@ export function makeCellUndraggable(cell) {
 }
 
 export function positionIsInPossibleMoves(position, possibleMoves) {
-  for (let i = 0; i < possibleMoves.length; i++) {
-    if (
-      position[0] === possibleMoves[i][0] &&
-      position[1] === possibleMoves[i][1]
-    ) {
-      return true;
-    }
-  }
-  return false;
+  return possibleMoves.some((move) => {
+    return position[0] === move[0] && position[1] === move[1];
+  });
 }
 
 export async function emitPieceSound() {

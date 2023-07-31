@@ -1,4 +1,4 @@
-import { Color } from "./pieces.js";
+import { PieceType, Color } from "./pieces.js";
 import {
   getCellCode,
   makeCellDraggable,
@@ -31,6 +31,7 @@ function updateTurnText(newTurn) {
 }
 
 function updateElementTime(color, time) {
+  console.log({color, time});
   time = Math.max(time, 0);
   const el = document.querySelector(`#player-${color}-time`);
   const minutes = Math.floor(time / 60);
@@ -43,6 +44,7 @@ export class Game {
   constructor(board, time) {
     this.board = board;
     this.turn = Color.White;
+
     this.check = false;
     this.checkmate = false;
     this.stalemate = false;
@@ -56,6 +58,55 @@ export class Game {
     this.blackTimeLeft = this.time;
 
     this.currentInterval = null;
+  }
+
+  getKing(color) {
+    for (let i = 0; i < this.board.rows; i++) {
+      for (let j = 0; j < this.board.columns; j++) {
+        const piece = this.board.board[i][j];
+        if (piece?.type === PieceType.King && piece.color === color) {
+          return piece;
+        }
+      }
+    }
+  }
+
+  isCheck(king) {
+    for (let i = 0; i < this.board.rows; i++) {
+      for (let j = 0; j < this.board.columns; j++) {
+        const piece = this.board.board[i][j];
+        if (!piece) {
+          continue;
+        }
+        if (piece.color !== king.color) {
+          const positions = piece.takingMoves(this);
+          if (
+            positions.some(
+              (position) =>
+                position[0] === king.positionY &&
+                position[1] === king.positionX,
+            )
+          ) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  isCheckmate() {
+    const king = this.getKing(this.turn);
+    const positions = king.possibleMoves(this);
+    return positions.length === 0 && this.isCheck(king);
+  }
+
+  endGame() {
+    window.alert("Mate con tomate");
+  }
+
+  showCheckMessage() {
+    window.alert("Check!");
   }
 
   changeTurn() {

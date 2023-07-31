@@ -215,7 +215,7 @@ class Bishop extends Piece {
     return moves;
   }
 
-  possibleMoves(game) {
+  takingMoves(game) {
     const board = game.board.board;
     const moves = [];
     const directions = [
@@ -230,11 +230,14 @@ class Bishop extends Piece {
       let nextY = this.positionY + y;
       let nextX = this.positionX + x;
 
+      let pieceFound = false;
+
       while (nextY >= 0 && nextY <= 7 && nextX >= 0 && nextX <= 7) {
         if (cellIsEmpty(board[nextY][nextX])) {
           moves.push([nextY, nextX]);
-        } else if (board[nextY][nextX]?.type !== PieceType.King) {
+        } else if (!pieceFound) {
           moves.push([nextY, nextX]);
+          pieceFound = true;
           break;
         } else {
           break;
@@ -306,11 +309,14 @@ class Rook extends Piece {
       let nextY = this.positionY + y;
       let nextX = this.positionX + x;
 
+      let pieceFound = false;
+
       while (nextY >= 0 && nextY <= 7 && nextX >= 0 && nextX <= 7) {
         if (cellIsEmpty(board[nextY][nextX])) {
           moves.push([nextY, nextX]);
-        } else if (board[nextY][nextX]?.type !== PieceType.King) {
+        } else if (!pieceFound) {
           moves.push([nextY, nextX]);
+          pieceFound = true;
           break;
         } else {
           break;
@@ -390,10 +396,12 @@ class Queen extends Piece {
       let nextY = this.positionY + y;
       let nextX = this.positionX + x;
 
+      let pieceFound = false;
+
       while (nextY >= 0 && nextY <= 7 && nextX >= 0 && nextX <= 7) {
         if (cellIsEmpty(board[nextY][nextX])) {
           moves.push([nextY, nextX]);
-        } else if (board[nextY][nextX]?.type !== PieceType.King) {
+        } else if (!pieceFound) {
           moves.push([nextY, nextX]);
           break;
         } else {

@@ -18,7 +18,7 @@ import {
   emitPieceSound,
 } from "./utils.js";
 
-const FREE_MOVE = true;
+const FREE_MOVE = 0;
 
 function getBoardInstance() {
   this.rows = 8;
@@ -96,6 +96,9 @@ function getBoardInstance() {
     toCell.style.backgroundImage = getBgImageUrl(this.getPiece(toRow, toCol));
     fromCell.setAttribute("style", "");
     makeCellDraggable(toCell);
+    if (FREE_MOVE) {
+      return;
+    }
     makeCellUndraggable(fromCell);
   };
 
@@ -141,11 +144,20 @@ function getBoardInstance() {
       }
     }
 
-    if (FREE_MOVE) {
-      return;
-    }
     if (changeTurn) {
       game.changeTurn();
+    }
+
+    // check for check
+    const king = game.getKing(game.turn);
+    console.log({ king });
+    console.log({ check: game.isCheck(king) });
+    if (game.isCheck(king)) {
+      if (game.isCheckmate()) {
+        game.endGame();
+      } else {
+        game.showCheckMessage();
+      }
     }
   };
 
@@ -233,7 +245,7 @@ function getCell(row, col, piece) {
   if (piece) {
     cell.style.backgroundImage = getBgImageUrl(piece);
     cell.style.backgroundSize = "cover";
-    if (piece.color == Color.White) {
+    if (FREE_MOVE || piece.color == Color.White) {
       makeCellDraggable(cell);
     }
   }
