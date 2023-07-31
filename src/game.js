@@ -3,6 +3,7 @@ import {
   getCellCode,
   makeCellDraggable,
   makeCellUndraggable,
+  positionIsInPossibleMoves,
 } from "./utils.js";
 
 function updateDraggableStateOnBoard(board, draggableColor) {
@@ -116,6 +117,44 @@ export class Game {
     ) {
       return false;
     }
+
+    // check that no piece can block the check
+    // check for line of direction between king and piece
+    const checkPiece = this._checkPieces[0];
+    const checkDirection = [
+      Math.sign(checkPiece.positionY - king.positionY),
+      Math.sign(checkPiece.positionX - king.positionX),
+    ];
+    const checkLine = [];
+    for (
+      let i = king.positionY + checkDirection[0],
+        j = king.positionX + checkDirection[1];
+      i !== checkPiece.positionY || j !== checkPiece.positionX;
+      i += checkDirection[0], j += checkDirection[1]
+    ) {
+      checkLine.push([i, j]);
+    }
+
+    // check if any piece can move to any position in the line
+    for (let i = 0; i < this.board.rows; i++) {
+      for (let j = 0; j < this.board.columns; j++) {
+        const piece = this.board.board[i][j];
+        if (!piece) {
+          continue;
+        }
+        if (piece.color === this.turn) {
+          const positions = piece.possibleMoves(this);
+          if (
+            positions.some((position) =>
+              positionIsInPossibleMoves(position, checkLine),
+            )
+          ) {
+            return false;
+          }
+        }
+      }
+    }
+
     return positions.length === 0 && this.isCheck(king);
   }
 
