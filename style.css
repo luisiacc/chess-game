@@ -3,6 +3,7 @@ body {
   --bg-black: #547f1f;
   --color-white: #eee;
   --color-black: #111;
+  font-family: "Roboto", sans-serif;
 }
 
 .bg-white {
@@ -96,4 +97,34 @@ main {
   font-size: 4rem;
   font-weight: 600;
   color: #3c0c0c;
+}
+
+.indicator-color-white {
+  color: var(--bg-white);
+}
+
+.indicator-color-black {
+  color: var(--bg-black);
+}
+
+.number-indicator {
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  font-size: 1.2rem;
+}
+
+.letter-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 5px;
+  font-size: 1.2rem;
+}
+
+.dragging .number-indicator {
+  display: none;
+}
+
+.dragging .letter-indicator {
+  display: none;
 }

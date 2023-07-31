@@ -20,6 +20,35 @@ import {
 
 const FREE_MOVE = 0;
 
+function paintIndicators(board) {
+  let cellsWithLetters = ["a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"];
+  let cellsWithNumbers = ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"];
+
+  for (let i = 0; i < cellsWithNumbers.length; i++) {
+    let code = cellsWithNumbers[i];
+    let cell = document.getElementById(code);
+    let numberIndicator = document.createElement("span");
+    numberIndicator.classList.add("number-indicator");
+    numberIndicator.classList.add(
+      i % 2 === 0 ? "indicator-color-white" : "indicator-color-black",
+    );
+    numberIndicator.innerHTML = i + 1;
+    cell.appendChild(numberIndicator);
+  }
+
+  for (let i = 0; i < cellsWithLetters.length; i++) {
+    let code = cellsWithLetters[i];
+    let cell = document.getElementById(code);
+    let letterIndicator = document.createElement("span");
+    letterIndicator.classList.add("letter-indicator");
+    letterIndicator.classList.add(
+      i % 2 === 0 ? "indicator-color-white" : "indicator-color-black",
+    );
+    letterIndicator.innerHTML = String.fromCharCode(97 + i);
+    cell.appendChild(letterIndicator);
+  }
+}
+
 function getBoardInstance() {
   this.rows = 8;
   this.columns = 8;
@@ -117,7 +146,6 @@ function getBoardInstance() {
       if (toRow === 0 || toRow === 7) {
         const color = this.board[toRow][toCol].color;
         this.board[toRow][toCol] = new Queen(color, PieceType.Queen);
-        console.log({ color, newCell: this.board[toRow][toCol] });
       }
     }
 
@@ -150,8 +178,6 @@ function getBoardInstance() {
 
     // check for check
     const king = game.getKing(game.turn);
-    console.log({ king });
-    console.log({ check: game.isCheck(king) });
     if (game.isCheck(king)) {
       if (game.isCheckmate()) {
         game.endGame();
@@ -230,6 +256,7 @@ function getBgImageUrl(piece) {
 }
 
 function getCell(row, col, piece) {
+  // const wrapper = document.createElement("div");
   const cell = document.createElement("div");
   cell.classList.add("cell");
   cell.setAttribute("id", getCellCode(row, col));
@@ -258,6 +285,7 @@ function getCell(row, col, piece) {
     event.target.style.border = "none";
     event.target.style.outline = "none";
     event.target.style.opacity = "0.95"; // temporal to remove outline when dragging
+    event.target.classList.add("dragging");
     // mark possible moves of the piece
     // can't use cell directly because this listener is on the starting cell, we have to get
     // the piece from the board
@@ -291,6 +319,7 @@ function getCell(row, col, piece) {
   });
   cell.addEventListener("dragend", function (event) {
     cell.style.backgroundColor = "";
+    event.target.classList.remove("dragging");
     removePossibleCells(possibleCells);
     possibleCells = [];
   });
@@ -333,3 +362,4 @@ function getBoardElement() {
 
 const el = document.querySelector("#main");
 el.appendChild(getBoardElement());
+paintIndicators(Board);

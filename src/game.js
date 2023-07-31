@@ -31,7 +31,6 @@ function updateTurnText(newTurn) {
 }
 
 function updateElementTime(color, time) {
-  console.log({color, time});
   time = Math.max(time, 0);
   const el = document.querySelector(`#player-${color}-time`);
   const minutes = Math.floor(time / 60);
