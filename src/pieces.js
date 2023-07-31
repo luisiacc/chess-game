@@ -171,6 +171,19 @@ class Knight extends Piece {
 
     return moves;
   }
+
+  takingMoves(game) {
+    return [
+      [this.positionY - 2, this.positionX - 1],
+      [this.positionY - 2, this.positionX + 1],
+      [this.positionY - 1, this.positionX - 2],
+      [this.positionY - 1, this.positionX + 2],
+      [this.positionY + 1, this.positionX - 2],
+      [this.positionY + 1, this.positionX + 2],
+      [this.positionY + 2, this.positionX - 1],
+      [this.positionY + 2, this.positionX + 1],
+    ];
+  }
 }
 
 class Bishop extends Piece {

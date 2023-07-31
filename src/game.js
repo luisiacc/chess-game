@@ -70,26 +70,37 @@ export class Game {
     }
   }
 
-  isCheck(king) {
+  piecesTakingPiece(pieceToTake) {
+    const piecesThanCanTake = [];
     for (let i = 0; i < this.board.rows; i++) {
       for (let j = 0; j < this.board.columns; j++) {
         const piece = this.board.board[i][j];
         if (!piece) {
           continue;
         }
-        if (piece.color !== king.color) {
+        if (piece.color !== pieceToTake.color) {
           const positions = piece.takingMoves(this);
           if (
             positions.some(
               (position) =>
-                position[0] === king.positionY &&
-                position[1] === king.positionX,
+                position[0] === pieceToTake.positionY &&
+                position[1] === pieceToTake.positionX,
             )
           ) {
-            return true;
+            piecesThanCanTake.push(piece);
           }
         }
       }
+    }
+
+    return piecesThanCanTake;
+  }
+
+  isCheck(king) {
+    let takerPieces = this.piecesTakingPiece(king);
+    if (takerPieces.length > 0) {
+      this._checkPieces = takerPieces;
+      return true;
     }
     return false;
   }
@@ -97,6 +108,14 @@ export class Game {
   isCheckmate() {
     const king = this.getKing(this.turn);
     const positions = king.possibleMoves(this);
+    // check that no piece can take the piece that is checking the king
+    if (
+      this._checkPieces.every(
+        (piece) => this.piecesTakingPiece(piece).length > 0,
+      )
+    ) {
+      return false;
+    }
     return positions.length === 0 && this.isCheck(king);
   }
 
